@@ -1,5 +1,6 @@
 import pygame
 from constants import *
+import player
 
 
 def main():
@@ -16,6 +17,8 @@ def main():
                 return
 
         screen.fill("black")
+        main_player = player.Player(x=SCREEN_WIDTH / 2, y=SCREEN_HEIGHT / 2)
+        main_player.draw(screen)
         pygame.display.flip()
 
         elap_time = clock.tick(60)
