@@ -33,7 +33,6 @@ class Player(CircleShape):
 
         if self.shot_timer > 0:
             self.shot_timer -= dt
-        print(self.shot_timer)
 
         if keys[pygame.K_a]:
             self.rotate(-dt)
