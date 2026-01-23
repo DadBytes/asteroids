@@ -1,9 +1,9 @@
 from constants import (
+    LINE_WIDTH,
     PLAYER_SHOOT_COOLDOWN_SECONDS,
     PLAYER_SHOOT_SPEED,
     PLAYER_TURN_SPEED,
     PLAYER_SPEED,
-    SHOT_RADIUS,
 )
 import pygame
 from constants import PLAYER_RADIUS
@@ -14,12 +14,13 @@ from shot import Shot
 class Player(CircleShape):
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_RADIUS)
-        self.x = x
-        self.y = y
         self.rotation = 0
         self.shot_cooldown = 0
 
     # in the Player class
+    def draw(self, screen):
+        pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
+
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
@@ -27,11 +28,6 @@ class Player(CircleShape):
         b = self.position - forward * self.radius - right
         c = self.position - forward * self.radius + right
         return [a, b, c]
-
-    def draw(self, screen):
-        color = "white"
-        triangle = self.triangle()
-        pygame.draw.polygon(screen, color, triangle)
 
     def rotate(self, dt):
         self.rotation += PLAYER_TURN_SPEED * dt
@@ -50,11 +46,7 @@ class Player(CircleShape):
         if keys[pygame.K_w]:
             self.move(dt)
         if keys[pygame.K_SPACE]:
-            if self.shot_cooldown > 0:
-                pass
-            else:
-                self.shot_cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS
-                self.shoot()
+            self.shoot()
 
     def move(self, dt):
         unit_vector = pygame.Vector2(0, 1)
@@ -63,7 +55,10 @@ class Player(CircleShape):
         self.position += rotated_with_speed_vector
 
     def shoot(self):
-        shot = Shot(self.x, self.y, SHOT_RADIUS)
+        if self.shot_cooldown > 0:
+            return
+        self.shot_cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS
+        shot = Shot(self.position.x, self.position.y)
         inital_vector = pygame.Vector2(0, 1)
         updated_vector = inital_vector.rotate(self.rotation)
         shot.velocity = updated_vector * PLAYER_SHOOT_SPEED
